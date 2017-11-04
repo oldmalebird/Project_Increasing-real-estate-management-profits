@@ -16,3 +16,14 @@ Here are some hints about how to write your queries:
 * If you run into trouble, use your workbooks and Teradata notes from “Managing Big Data with MySQL” to remind you how to implement different parts of your query.
 Begin by opening the Jupyter notebook in this lesson; the instructions and information in this reading are replicated there.
 */
+%load_ext sql
+%sql mysql://studentuser:studentpw@mysqlserver/capstone
+%sql USE capstone
+
+%sql SHOW tables
+
+%%sql
+select stinfo.st_property_id, stinfo.location, stinfo.property_type
+from st_property_info stinfo left join st_rental_prices stprices
+on stinfo.location = stprices.location and stinfo.property_type = stprices.property_type
+where stprices.property_type is null
