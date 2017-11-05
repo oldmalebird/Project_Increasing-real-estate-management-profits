@@ -27,3 +27,38 @@ select stinfo.st_property_id, stinfo.location, stinfo.property_type
 from st_property_info stinfo left join st_rental_prices stprices
 on stinfo.location = stprices.location and stinfo.property_type = stprices.property_type
 where stprices.property_type is null
+
+
+%%sql
+SELECT distinct ws.ws_property_id, ws.property_type, ws.location,
+stprices.sample_nightly_rent_price
+
+FROM watershed_property_info ws, st_rental_prices stprices,
+st_property_info stinfo, st_rental_dates dates
+
+WHERE ws.property_type = stprices.property_type and ws.location = stprices.location
+and ws.property_type = stinfo.property_type and ws.location = stinfo.location
+and stinfo.st_property_id = dates.st_property
+and YEAR(dates.rental_date) = 2015
+
+
+%%sql
+SELECT distinct ws.ws_property_id, ws.location,
+location.city, location.state, location.zipcode,
+ptype.apt_house, ptype.num_bedroom, ptype.kitchen, ptype.shared,
+stprices.sample_nightly_rent_price, stprices.percentile_10th_price, stprices.percentile_90th_price,
+COUNT(DISTINCT dates.rental_date) / 365 as 'OccupancyRate for 2015'
+
+FROM watershed_property_info ws, st_rental_prices stprices,
+st_property_info stinfo, st_rental_dates dates, location, property_type ptype
+
+WHERE ws.location = location.location_id and ws.property_type = ptype.property_type_id
+and ws.property_type = stprices.property_type and ws.location = stprices.location
+and ws.property_type = stinfo.property_type and ws.location = stinfo.location
+and stinfo.st_property_id = dates.st_property
+and YEAR(dates.rental_date) = 2015
+
+GROUP BY ws.ws_property_id, ws.location,
+location.city, location.state, location.zipcode,
+ptype.apt_house, ptype.num_bedrooms, ptype.kitchen, ptype.shared,
+stprices.sample_nightly_rent_price, stprices.percentile_10th_price, stprices.percentile_90th_price, stprices.sample_nightly_rent_price
