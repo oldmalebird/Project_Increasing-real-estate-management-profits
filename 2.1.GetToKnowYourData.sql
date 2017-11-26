@@ -45,7 +45,7 @@ and YEAR(dates.rental_date) = 2015
 %%sql
 SELECT distinct ws.ws_property_id, ws.location,
 location.city, location.state, location.zipcode,
-ptype.apt_house, ptype.num_bedroom, ptype.kitchen, ptype.shared,
+ptype.apt_house, ptype.num_bedroom, ptype.kitchen, ptype.shared, ws.current_monthly_rent,
 stprices.sample_nightly_rent_price, stprices.percentile_10th_price, stprices.percentile_90th_price,
 COUNT(DISTINCT dates.rental_date) / 365 as 'OccupancyRate for 2015'
 
