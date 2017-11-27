@@ -45,9 +45,34 @@ and YEAR(dates.rental_date) = 2015
 %%sql
 SELECT distinct ws.ws_property_id, ws.location,
 location.city, location.state, location.zipcode,
-ptype.apt_house, ptype.num_bedroom, ptype.kitchen, ptype.shared, ws.current_monthly_rent,
+ptype.apt_house, ptype.num_bedrooms, ptype.kitchen, ptype.shared, ws.current_monthly_rent,
 stprices.sample_nightly_rent_price, stprices.percentile_10th_price, stprices.percentile_90th_price,
 COUNT(DISTINCT dates.rental_date) / 365 as 'OccupancyRate for 2015'
+
+FROM watershed_property_info ws, st_rental_prices stprices,
+st_property_info stinfo, st_rental_dates dates, location, property_type ptype
+
+WHERE ws.location = location.location_id and ws.property_type = ptype.property_type_id
+and ws.property_type = stprices.property_type and ws.location = stprices.location
+and ws.property_type = stinfo.property_type and ws.location = stinfo.location
+and stinfo.st_property_id = dates.st_property
+and YEAR(dates.rental_date) = 2015
+
+GROUP BY ws.ws_property_id, ws.location,
+location.city, location.state, location.zipcode,
+ptype.apt_house, ptype.num_bedrooms, ptype.kitchen, ptype.shared,
+stprices.sample_nightly_rent_price, stprices.percentile_10th_price, stprices.percentile_90th_price, stprices.sample_nightly_rent_price
+
+--rename column names 26/11/2017
+%%sql
+SELECT distinct ws.ws_property_id as "Watershed property ID", ws.location as 'location ID',
+location.city, location.state, location.zipcode,
+ptype.apt_house as 'property type', ptype.num_bedrooms as 'Number of Bedrooms', ptype.kitchen, ptype.shared,
+ws.current_monthly_rent as 'LT - Monthly $ Rent',
+stprices.sample_nightly_rent_price as 'ST Example $ Rent',
+stprices.percentile_10th_price as 'ST - $ 10th percentile rent',
+stprices.percentile_90th_price as 'ST - $ 90th percentile rent',
+COUNT(DISTINCT dates.rental_date) / 365 as 'ST Example Occupancy Rate'
 
 FROM watershed_property_info ws, st_rental_prices stprices,
 st_property_info stinfo, st_rental_dates dates, location, property_type ptype
